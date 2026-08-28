@@ -1,4 +1,4 @@
-name: Download EPG files
+name: Download EPG files from source
 
 on:
   workflow_dispatch:
