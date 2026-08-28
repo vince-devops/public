@@ -20,19 +20,24 @@ jobs:
         env:
           OPEN_EPG_GZ_URL: ${{ secrets.open_epg_gz_url }}
           OPEN_EPG_XML_URL: ${{ secrets.open_epg_xml_url }}
+          OPEN_EPG_GZ_FILE: ${{ secrets.OPEN_EPG_GZ_FILE }}
+          OPEN_EPG_XML_FILE: ${{ secrets.OPEN_EPG_XML_FILE }}
         run: |
           curl --fail --location --retry 3 --retry-delay 5 \
-            --output 8ezrGcvvx9.xml.gz \
+            --output "$OPEN_EPG_GZ_FILE" \
             "$OPEN_EPG_GZ_URL"
           curl --fail --location --retry 3 --retry-delay 5 \
-            --output 8ezrGcvvx9.xml \
+            --output "$OPEN_EPG_XML_FILE" \
             "$OPEN_EPG_XML_URL"
 
       - name: Commit and push changes
+        env:
+          OPEN_EPG_GZ_FILE: ${{ secrets.OPEN_EPG_GZ_FILE }}
+          OPEN_EPG_XML_FILE: ${{ secrets.OPEN_EPG_XML_FILE }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add 8ezrGcvvx9.xml.gz 8ezrGcvvx9.xml
+          git config user.name "vince-devops"
+          git config user.email "vincent.coens@telenet.be"
+          git add "$OPEN_EPG_GZ_FILE" "$OPEN_EPG_XML_FILE"
           if git diff --cached --quiet; then
             echo "EPG files are unchanged"
           else
