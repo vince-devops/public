@@ -1,0 +1,41 @@
+name: Download EPG files
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 7 * * *"
+    - cron: "15 17 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download EPG files
+        env:
+          OPEN_EPG_GZ_URL: ${{ secrets.open_epg_gz_url }}
+          OPEN_EPG_XML_URL: ${{ secrets.open_epg_xml_url }}
+        run: |
+          curl --fail --location --retry 3 --retry-delay 5 \
+            --output 8ezrGcvvx9.xml.gz \
+            "$OPEN_EPG_GZ_URL"
+          curl --fail --location --retry 3 --retry-delay 5 \
+            --output 8ezrGcvvx9.xml \
+            "$OPEN_EPG_XML_URL"
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 8ezrGcvvx9.xml.gz 8ezrGcvvx9.xml
+          if git diff --cached --quiet; then
+            echo "EPG files are unchanged"
+          else
+            git commit -m "Update EPG files"
+            git push
+          fi
